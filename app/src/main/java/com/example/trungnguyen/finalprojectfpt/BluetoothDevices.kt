@@ -4,7 +4,6 @@ package com.example.trungnguyen.finalprojectfpt
  * Author : Trung Nguyen
  * Create Date : 8/28/2017
  */
-import android.annotation.SuppressLint
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -28,25 +27,25 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
-@SuppressLint("MissingPermission")
+
 class BluetoothDevices : Activity(), OnItemClickListener {
-    internal lateinit var listAdapter: ArrayAdapter<String>
-    private lateinit var listView: ListView
-    private lateinit var devicesArray: Set<BluetoothDevice>
-    internal lateinit var pairedDevices: ArrayList<String>
-    internal lateinit var devices: ArrayList<BluetoothDevice>
-    private lateinit var filter: IntentFilter
-    private lateinit var receiver: BroadcastReceiver
+    internal lateinit var mAdapter: ArrayAdapter<String>
+    private lateinit var mListView: ListView
+    private lateinit var mDevicesArray: Set<BluetoothDevice>
+    internal lateinit var mPairedDevices: ArrayList<String>
+    internal lateinit var mDevices: ArrayList<BluetoothDevice>
+    private lateinit var mFilter: IntentFilter
+    private lateinit var mReceiver: BroadcastReceiver
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.bluetooth_activity)
         init()
-        if (btAdapter == null) {
+        if (mBlueToothAdapter == null) {
             Toast.makeText(applicationContext, "Không tìm thấy bluetooth", Toast.LENGTH_SHORT).show()
             finish()
         } else {
-            if (!btAdapter!!.isEnabled) {
+            if (!mBlueToothAdapter!!.isEnabled) {
                 turnOnBT()
             }
             getPairedDevices()
@@ -55,10 +54,9 @@ class BluetoothDevices : Activity(), OnItemClickListener {
 
     }
 
-
     private fun startDiscovery() {
-        btAdapter!!.cancelDiscovery()
-        btAdapter!!.startDiscovery()
+        mBlueToothAdapter!!.cancelDiscovery()
+        mBlueToothAdapter!!.startDiscovery()
     }
 
     private fun turnOnBT() {
@@ -67,65 +65,56 @@ class BluetoothDevices : Activity(), OnItemClickListener {
     }
 
     private fun getPairedDevices() {
-        devicesArray = btAdapter!!.bondedDevices
-        if (devicesArray.isNotEmpty()) {
-            for (device in devicesArray) {
-                pairedDevices.add(device.name)
+        mDevicesArray = mBlueToothAdapter!!.bondedDevices
+        if (mDevicesArray.isNotEmpty()) {
+            for (device in mDevicesArray) {
+                mPairedDevices.add(device.name)
             }
         }
     }
 
     private fun init() {
-        listView = findViewById(R.id.listView)
-        listView.onItemClickListener = this
-        listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, 0)
-        listView.adapter = listAdapter
-        btAdapter = BluetoothAdapter.getDefaultAdapter()
-        pairedDevices = ArrayList()
-        filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
-        devices = ArrayList()
-        receiver = object : BroadcastReceiver() {
+        mListView = findViewById(R.id.listView)
+        mListView.onItemClickListener = this
+        mAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, 0)
+        mListView.adapter = mAdapter
+        mBlueToothAdapter = BluetoothAdapter.getDefaultAdapter()
+        mPairedDevices = ArrayList()
+        mFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
+        mDevices = ArrayList()
+        mReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val action = intent.action
-                if (BluetoothDevice.ACTION_FOUND == action) {
-                    val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                    devices.add(device)
-                    val s = if (pairedDevices.indices.any { device.name == pairedDevices[it] }) "(Paired)" else ""
-
-//                    for (a in pairedDevices.indices) {
-//                        if (device.name == pairedDevices[a]) {
-//                            //append
-//                            s = "(Paired)"
-//                            break
-//                        }
-//                    }
-
-                    listAdapter.add(device.name + " " + s + " " + "\n" + device.address)
-
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED == action) {
-
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action) {
-
-                } else if (BluetoothAdapter.ACTION_STATE_CHANGED == action) {
-                    if (btAdapter!!.state == btAdapter!!.state) {
-                        turnOnBT()
+                when (action) {
+                    BluetoothDevice.ACTION_FOUND -> {
+                        val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                        mDevices.add(device)
+                        val s = if (mPairedDevices.indices.any { device.name == mPairedDevices[it] }) "(Paired)" else ""
+                        mAdapter.add(device.name + " " + s + " " + "\n" + device.address)
+                    }
+                    BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
+                    }
+                    BluetoothAdapter.ACTION_DISCOVERY_FINISHED -> {
+                    }
+                    BluetoothAdapter.ACTION_STATE_CHANGED -> {
+                        if (mBlueToothAdapter!!.state == BluetoothAdapter.STATE_OFF)
+                            turnOnBT()
                     }
                 }
             }
-
         }
 
-        registerReceiver(receiver, filter)
+        registerReceiver(mReceiver, mFilter)
         var filter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED)
-        registerReceiver(receiver, filter)
+        registerReceiver(mReceiver, filter)
         filter = IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
-        registerReceiver(receiver, filter)
+        registerReceiver(mReceiver, filter)
     }
 
     override fun onPause() {
         super.onPause()
         try {
-            unregisterReceiver(receiver)
+            unregisterReceiver(mReceiver)
         } catch (e: IllegalArgumentException) {
             Log.d("Exception: ", e.message)
         }
@@ -141,12 +130,12 @@ class BluetoothDevices : Activity(), OnItemClickListener {
     }
 
     override fun onItemClick(arg0: AdapterView<*>, arg1: View, arg2: Int, arg3: Long) {
-        if (btAdapter!!.isDiscovering) {
-            btAdapter!!.cancelDiscovery()
+        if (mBlueToothAdapter!!.isDiscovering) {
+            mBlueToothAdapter!!.cancelDiscovery()
         }
-        if (listAdapter.getItem(arg2)!!.contains("(Paired)")) {
+        if (mAdapter.getItem(arg2)!!.contains("(Paired)")) {
 
-            val selectedDevice = devices[arg2]
+            val selectedDevice = mDevices[arg2]
             val connect = ConnectThread(selectedDevice)
             connect.start()
         } else {
@@ -168,7 +157,7 @@ class BluetoothDevices : Activity(), OnItemClickListener {
         }
 
         override fun run() {
-            btAdapter!!.cancelDiscovery()
+            mBlueToothAdapter!!.cancelDiscovery()
             try {
                 mmSocket!!.connect()
             } catch (connectException: IOException) {
@@ -179,7 +168,7 @@ class BluetoothDevices : Activity(), OnItemClickListener {
 
                 return
             }
-            mHandler.obtainMessage(SUCCESS_CONNECT, mmSocket).sendToTarget()
+            mHandler?.obtainMessage(SUCCESS_CONNECT, mmSocket)?.sendToTarget()
         }
     }
 
@@ -201,7 +190,6 @@ class BluetoothDevices : Activity(), OnItemClickListener {
         }
 
         override fun run() {
-
             var buffer: ByteArray
             var bytes: Int
 
@@ -215,12 +203,13 @@ class BluetoothDevices : Activity(), OnItemClickListener {
 
                     buffer = ByteArray(1024)
                     bytes = mmInStream!!.read(buffer)
-                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget()
+                    mHandler?.obtainMessage(MESSAGE_READ, bytes, -1, buffer)?.sendToTarget()
                 } catch (ignored: IOException) {
                 }
 
             }
         }
+
         fun cancel() {
             try {
                 mmSocket.close()
@@ -236,12 +225,12 @@ class BluetoothDevices : Activity(), OnItemClickListener {
             mHandler = handler
         }
 
-        internal var mHandler = Handler()
-        internal var connectedThread: ConnectedThread? = null
+        internal var mHandler: Handler? = null
+        internal var mConnectedThread: ConnectedThread? = null
         val MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")!!
-        val SUCCESS_CONNECT = 0
-        val MESSAGE_READ = 1
-        internal var btAdapter: BluetoothAdapter? = null
+        const val SUCCESS_CONNECT = 0
+        const val MESSAGE_READ = 1
+        internal var mBlueToothAdapter: BluetoothAdapter? = null
     }
 
 }

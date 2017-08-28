@@ -28,7 +28,7 @@ class PlayerHandler(private val mPlayerService: PlayerService) : Handler() {
                     message.arg1 = 0
                 else
                     message.arg1 = isPlaying //Music is not playing and user start new track
-                message.replyTo = mPlayerService.messenger
+                message.replyTo = mPlayerService.mMessenger
                 try {
                     msg.replyTo.send(message)
                 } catch (e: RemoteException) {

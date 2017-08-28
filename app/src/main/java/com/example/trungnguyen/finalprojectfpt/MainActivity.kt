@@ -12,11 +12,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 
-import java.util.ArrayList
 import android.widget.Toast
 import android.bluetooth.BluetoothSocket
 import android.os.*
-
+import java.util.*
 
 /**
  * Author : Trung Nguyen
@@ -24,36 +23,34 @@ import android.os.*
  */
 
 class MainActivity : AppCompatActivity() {
-    private var btnRepeat: ImageView? = null
     private var btSkipNext: ImageView? = null
     private var btSkipPrevious: ImageView? = null
     var imgPlayPause: ImageView? = null
     private var mBound = false
-    private val activityMessenger = Messenger(ActivityHandler(this))
-    private var playerMessenger: Messenger? = null
-    private var songUrl: String? = null
-    private var songIndex: Int = 0
-    private lateinit var mSongList: ArrayList<String>
-    private var serviceConnection: ServiceConnection = object : ServiceConnection {
+    private val mActivityMessenger = Messenger(ActivityHandler(this))
+    private var mPlayerMessenger: Messenger? = null
+    private var mUrl: String? = null
+    private var mIndex: Int = 0
+    private lateinit var mListTrack: ArrayList<String>
+    private var mServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
             mBound = true
-            val startServiceIntent = Intent(this@MainActivity, PlayerService::class.java)
-            startService(startServiceIntent)
-            val songUrlIntent = Intent("SEND_SONG_URL")
-            if (songUrl != null) {
-                songUrlIntent.putExtra("SONG_URL", songUrl)
-                sendBroadcast(songUrlIntent)
+            val serviceIntent = Intent(this@MainActivity, PlayerService::class.java)
+            startService(serviceIntent)
+            val intent = Intent(INTENT_SERVICE)
+            if (mUrl != null) {
+                intent.putExtra(URL, mUrl)
+                sendBroadcast(intent)
             }
             if (isNetworkAvailable) {
-                playerMessenger = Messenger(iBinder)
+                mPlayerMessenger = Messenger(iBinder)
                 val message = Message.obtain()
                 message.arg1 = 2
                 message.arg2 = 2
-                message.replyTo = activityMessenger
+                message.replyTo = mActivityMessenger
                 try {
-                    playerMessenger!!.send(message)
-                } catch (e: RemoteException) {
-                    e.printStackTrace()
+                    mPlayerMessenger!!.send(message)
+                } catch (ignored: RemoteException) {
                 }
 
             }
@@ -70,9 +67,9 @@ class MainActivity : AppCompatActivity() {
             super.handleMessage(msg)
             when (msg.what) {
                 BluetoothDevices.Companion.SUCCESS_CONNECT -> {
-                    BluetoothDevices.connectedThread = BluetoothDevices.ConnectedThread(msg.obj as BluetoothSocket)
+                    BluetoothDevices.mConnectedThread = BluetoothDevices.ConnectedThread(msg.obj as BluetoothSocket)
                     Toast.makeText(applicationContext, "Đã Kết Nối!", Toast.LENGTH_SHORT).show()
-                    BluetoothDevices.connectedThread!!.start()
+                    BluetoothDevices.mConnectedThread!!.start()
                 }
                 BluetoothDevices.Companion.MESSAGE_READ -> {
                     val readBuf = msg.obj as ByteArray
@@ -82,24 +79,22 @@ class MainActivity : AppCompatActivity() {
                         's' -> playOrPauseMedia()
                         'n' -> nextTrack()
                         'p' -> previousTrack()
+                        else -> Toast.makeText(applicationContext, "Lệnh điều khiển chưa hợp lệ", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
-
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mSongList = ArrayList()
-        mSongList.add("http://zmp3-mp3-s1-te-vnso-tn-8.zadn.vn/8739deea06aeeff0b6bf/1243431489925204133?authen=exp=1503947405~acl=/8739deea06aeeff0b6bf/*~hmac=508081dea8cb04e2c7ad44da3698e85a")
-        mSongList.add("http://zmp3-mp3-s1-te-zmp3-fpthcm-1.zadn.vn/fc6afd732537cc699526/3124316109290043920?authen=exp=1503947878~acl=/fc6afd732537cc699526/*~hmac=fe923789774c9f2c0c6478cf5b6b6dd3")
-        mSongList.add("http://zmp3-mp3-s1-te-zmp3-bdhcm-1.zadn.vn/c56bfc772433cd6d9422/6711005331051776182?authen=exp=1503946615~acl=/c56bfc772433cd6d9422/*~hmac=f23146a3f0c8aa2193d9bfcd278d7cf1")
-        mSongList.add("http://zmp3-mp3-s1-te-zmp3-bdhcm-1.zadn.vn/d6ac9d8c44c8ad96f4d9/7646434173735821454?authen=exp=1503948189~acl=/d6ac9d8c44c8ad96f4d9/*~hmac=e13139b051743377c24c2d7edf298cc5")
+        mListTrack = ArrayList()
+        mListTrack.add("http://zmp3-mp3-s1-te-zmp3-bdhcm-1.zadn.vn/ccdf4a779033796d2022/7340335391073080988?authen=exp=1503969897~acl=/ccdf4a779033796d2022/*~hmac=0db50abfc497ecbcf547eae0a2971739")
+        mListTrack.add("http://zmp3-mp3-s1-te-vnso-tn-8.zadn.vn/0084a8e771a398fdc1b2/2434791795262812451?authen=exp=1503969290~acl=/0084a8e771a398fdc1b2/*~hmac=c9f8ef989dc4809752ad712935fbddf7")
         addControls()
-        songUrl = mSongList[0]
-        songIndex = 0
+        mUrl = mListTrack[0]
+        mIndex = 0
         BluetoothDevices.getHandler(mHandler)
     }
 
@@ -110,40 +105,40 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun previousTrack(){
-        songIndex--
-        if (songIndex < 0) songIndex = mSongList.size - 1
-        play(songIndex)
+    private fun previousTrack() {
+        mIndex--
+        if (mIndex < 0) mIndex = mListTrack.size - 1
+        play(mIndex)
     }
 
     private fun ButtonSkipNextEvent() {
         btSkipNext!!.setOnClickListener { view ->
-           nextTrack()
+            nextTrack()
         }
     }
 
-    private fun nextTrack(){
-        songIndex++
-        if (songIndex >= mSongList.size) {
-            songIndex = 0
+    private fun nextTrack() {
+        mIndex++
+        if (mIndex >= mListTrack.size) {
+            mIndex = 0
         }
-        play(songIndex)
+        play(mIndex)
     }
 
     private fun play(index: Int) {
-        val songUrlIntent = Intent("SEND_SONG_URL")
-        songUrl = mSongList[index]
-        if (songUrl != null) {
-            songUrlIntent.putExtra("SONG_URL", songUrl)
-            sendBroadcast(songUrlIntent)
+        val intent = Intent(INTENT_SERVICE)
+        mUrl = mListTrack[index]
+        if (mUrl != null) {
+            intent.putExtra(URL, mUrl)
+            sendBroadcast(intent)
         }
         if (isNetworkAvailable) {
             val message = Message.obtain()
             message.arg1 = 2
             message.arg2 = 2
-            message.replyTo = activityMessenger
+            message.replyTo = mActivityMessenger
             try {
-                playerMessenger!!.send(message)
+                mPlayerMessenger!!.send(message)
             } catch (e: RemoteException) {
                 e.printStackTrace()
             }
@@ -157,24 +152,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun playOrPauseMedia(){
+    private fun playOrPauseMedia() {
         if (isNetworkAvailable) {
-                val message = Message.obtain()
-                message.arg1 = 2
-                message.arg2 = 1
-                message.replyTo = activityMessenger
-                try {
-                    playerMessenger!!.send(message)
-                } catch (e: RemoteException) {
-                    e.printStackTrace()
-                }
+            val message = Message.obtain()
+            message.arg1 = 2
+            message.arg2 = 1
+            message.replyTo = mActivityMessenger
+            try {
+                mPlayerMessenger!!.send(message)
+            } catch (e: RemoteException) {
+                e.printStackTrace()
             }
+        }
     }
 
 
     private fun addControls() {
-        btnRepeat = findViewById<View>(R.id.btRepeat) as ImageView
-        btnRepeat!!.setImageResource(R.drawable.btn_playback_repeat)
         imgPlayPause = findViewById<View>(R.id.btPlayPause) as ImageView
         imgPlayPause?.setBackgroundResource(R.drawable.click_effet)
         ButtonPlayPauseEvent()
@@ -201,7 +194,7 @@ class MainActivity : AppCompatActivity() {
     public override fun onPause() {
         super.onPause()
         if (mBound) {
-            unbindService(serviceConnection)
+            unbindService(mServiceConnection)
             mBound = false
         }
     }
@@ -209,13 +202,13 @@ class MainActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         val intent = Intent(this, PlayerService::class.java)
-        if (songUrl != null)
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        if (mUrl != null)
+            bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)
     }
 
     public override fun onStop() {
         if (mBound) {
-            unbindService(serviceConnection)
+            unbindService(mServiceConnection)
             mBound = false
         }
         super.onStop()
@@ -232,15 +225,19 @@ class MainActivity : AppCompatActivity() {
             R.id.bt_connect -> startActivity(Intent(this, BluetoothDevices::class.java))
             R.id.bt_disconnect -> {
                 try {
-                    BluetoothDevices.connectedThread!!.cancel()
-                    Toast.makeText(applicationContext, "Đã ngắt kết nối !", Toast.LENGTH_LONG).show()
+                    BluetoothDevices.mConnectedThread!!.cancel()
+                    Toast.makeText(applicationContext, "Đã ngắt kết nối !", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    Toast.makeText(applicationContext, "Chưa kết nối !", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "Chưa kết nối !", Toast.LENGTH_SHORT).show()
                 }
-
             }
         }
         return true
+    }
+
+    companion object {
+        const val INTENT_SERVICE = "send_track_intent"
+        const val URL = "URL"
     }
 }
 

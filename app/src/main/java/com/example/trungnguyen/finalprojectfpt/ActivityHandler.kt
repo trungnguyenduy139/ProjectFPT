@@ -8,7 +8,7 @@ import android.os.RemoteException
  * Author : Trung Nguyen
  * Create Date : 8/28/2017
  */
-class ActivityHandler(private val mNowPlayingFragment: MainActivity) : Handler() {
+class ActivityHandler(private val mMainActivity: MainActivity) : Handler() {
     override fun handleMessage(msg: Message) {
         if (msg.arg1 == 0) {
             //Music is not playing
@@ -21,7 +21,7 @@ class ActivityHandler(private val mNowPlayingFragment: MainActivity) : Handler()
             }
 
             //Change button to "Pause"
-            mNowPlayingFragment.imgPlayPause?.setImageResource(R.drawable.pause_circle)
+            mMainActivity.imgPlayPause?.setImageResource(R.drawable.pause_circle)
         } else if (msg.arg1 == 1) {
             //Music is playing
             val message = Message.obtain()
@@ -33,7 +33,7 @@ class ActivityHandler(private val mNowPlayingFragment: MainActivity) : Handler()
             }
 
             //Change the button to "Play"
-            mNowPlayingFragment.imgPlayPause?.setImageResource(R.drawable.play_circle)
+            mMainActivity.imgPlayPause?.setImageResource(R.drawable.play_circle)
         }
     }
 }
