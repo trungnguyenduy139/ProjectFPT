@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rootFragmentNowPlaying"
+    android:background="#161d4f"
+    tools:context="com.example.trungnguyen.finalprojectfpt.MainActivity">
+    <TextView
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0:0"
+        android:id="@+id/tvMaxTime"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="6dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="92dp"
+        android:textColor="#ffffff" />
+
+    <TextView
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0:0"
+        android:id="@+id/tvCurrentPosition"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="6dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="90dp"
+        android:textColor="#ffffff" />
+
+    <SeekBar
+        android:visibility="invisible"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBar"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="84dp"
+        android:layout_centerHorizontal="true"
+        android:indeterminate="false" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/btPlayPause"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="22dp"
+        android:src="@drawable/play_circle" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btRepeat"
+        android:layout_alignBottom="@+id/btPlayPause"
+        android:layout_alignRight="@+id/tvCurrentPosition"
+        android:layout_alignEnd="@+id/tvCurrentPosition"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="7dp"
+        android:src="@drawable/btn_playback_repeat" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btSuffle"
+        android:layout_alignBottom="@+id/btPlayPause"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/btn_playback_shuffle" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/btSkipNext"
+        android:layout_alignBottom="@+id/btPlayPause"
+        android:layout_alignRight="@+id/seekBar"
+        android:layout_alignEnd="@+id/seekBar"
+        android:layout_marginRight="50dp"
+        android:src="@drawable/ic_skip_next_white_48dp" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/btSkipPrevious"
+        android:layout_alignBottom="@+id/btSkipNext"
+        android:layout_alignLeft="@+id/seekBar"
+        android:layout_alignStart="@+id/seekBar"
+        android:layout_marginLeft="50dp"
+        android:src="@drawable/ic_skip_previous_white_48dp" />
+
+</RelativeLayout>
