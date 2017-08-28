@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun ButtonSkipPreviousEvent() {
+    private fun skipPreviousEvent() {
         btSkipPrevious!!.setOnClickListener { view ->
             previousTrack()
         }
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         play(mIndex)
     }
 
-    private fun ButtonSkipNextEvent() {
+    private fun skipNextEvent() {
         btSkipNext!!.setOnClickListener { view ->
             nextTrack()
         }
@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun ButtonPlayPauseEvent() {
+    private fun playPauseEvent() {
         imgPlayPause?.setOnClickListener { view ->
             playOrPauseMedia()
         }
@@ -170,13 +170,13 @@ class MainActivity : AppCompatActivity() {
     private fun addControls() {
         imgPlayPause = findViewById<View>(R.id.btPlayPause) as ImageView
         imgPlayPause?.setBackgroundResource(R.drawable.click_effet)
-        ButtonPlayPauseEvent()
+        playPauseEvent()
         btSkipNext = findViewById<View>(R.id.btSkipNext) as ImageView
         btSkipNext!!.setBackgroundResource(R.drawable.click_effet)
         btSkipPrevious = findViewById<View>(R.id.btSkipPrevious) as ImageView
         btSkipPrevious!!.setBackgroundResource(R.drawable.click_effet)
-        ButtonSkipNextEvent()
-        ButtonSkipPreviousEvent()
+        skipNextEvent()
+        skipPreviousEvent()
     }
 
     private val isNetworkAvailable: Boolean

@@ -26,17 +26,11 @@ class PlayerService : Service() {
 
     override fun onCreate() {
         mMediaPlayer = MediaPlayer()
-        mUrl = null
         registerReceiver(songUrlReceiver, IntentFilter(
                 MainActivity.Companion.INTENT_SERVICE))
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        mMediaPlayer!!.setOnCompletionListener { mediaPlayer ->
-            mediaPlayer.isLooping = false
-            stopSelf()
-            stopForeground(true)
-        }
         return Service.START_NOT_STICKY
     }
 
@@ -60,9 +54,7 @@ class PlayerService : Service() {
         }
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return mMessenger.binder
-    }
+    override fun onBind(intent: Intent): IBinder? = mMessenger.binder
 
     override fun onDestroy() {
         unregisterReceiver(songUrlReceiver)
