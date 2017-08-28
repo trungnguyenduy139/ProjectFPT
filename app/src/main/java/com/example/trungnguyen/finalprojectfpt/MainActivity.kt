@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity() {
         mListTrack.add("http://zmp3-mp3-s1-te-vnso-tn-8.zadn.vn/0084a8e771a398fdc1b2/2434791795262812451?authen=exp=1503969290~acl=/0084a8e771a398fdc1b2/*~hmac=c9f8ef989dc4809752ad712935fbddf7")
         addControls()
         mUrl = mListTrack[0]
-        mIndex = 0
         BluetoothDevices.getHandler(mHandler)
     }
 

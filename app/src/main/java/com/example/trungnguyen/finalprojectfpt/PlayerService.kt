@@ -45,7 +45,7 @@ class PlayerService : Service() {
                     mMediaPlayer!!.setDataSource(applicationContext, uri)
                     mMediaPlayer!!.setAudioStreamType(AudioManager.STREAM_MUSIC)
                     mMediaPlayer!!.prepare()
-                    mMediaPlayer!!.isLooping = false
+                    mMediaPlayer!!.isLooping = true
                 } catch (e: IOException) {
                     Log.d(TAG, e.message)
                 }
