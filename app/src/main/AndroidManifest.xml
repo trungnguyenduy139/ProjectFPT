@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Bluetooth"
+        <activity android:name=".BluetoothDevices"
             android:configChanges="orientation|keyboardHidden"
             android:enabled="true"
             android:label="Chọn thiết bị kết nối"

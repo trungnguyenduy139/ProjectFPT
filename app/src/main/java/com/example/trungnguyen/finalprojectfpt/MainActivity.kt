@@ -69,12 +69,12 @@ class MainActivity : AppCompatActivity() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             when (msg.what) {
-                Bluetooth.Companion.SUCCESS_CONNECT -> {
-                    Bluetooth.connectedThread = Bluetooth.ConnectedThread(msg.obj as BluetoothSocket)
-                    Toast.makeText(applicationContext, "Connected!", Toast.LENGTH_SHORT).show()
-                    Bluetooth.connectedThread!!.start()
+                BluetoothDevices.Companion.SUCCESS_CONNECT -> {
+                    BluetoothDevices.connectedThread = BluetoothDevices.ConnectedThread(msg.obj as BluetoothSocket)
+                    Toast.makeText(applicationContext, "Đã Kết Nối!", Toast.LENGTH_SHORT).show()
+                    BluetoothDevices.connectedThread!!.start()
                 }
-                Bluetooth.Companion.MESSAGE_READ -> {
+                BluetoothDevices.Companion.MESSAGE_READ -> {
                     val readBuf = msg.obj as ByteArray
                     val strIncom = String(readBuf)
                     val char = strIncom[0]
@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
         addControls()
         songUrl = mSongList[0]
         songIndex = 0
-        Bluetooth.getHandler(mHandler)
+        BluetoothDevices.getHandler(mHandler)
     }
 
 
@@ -229,13 +229,13 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val id = item?.itemId
         when (id) {
-            R.id.bt_connect -> startActivity(Intent(this, Bluetooth::class.java))
+            R.id.bt_connect -> startActivity(Intent(this, BluetoothDevices::class.java))
             R.id.bt_disconnect -> {
                 try {
-                    Bluetooth.connectedThread!!.cancel()
-                    Toast.makeText(applicationContext, "disconected !", Toast.LENGTH_LONG).show()
+                    BluetoothDevices.connectedThread!!.cancel()
+                    Toast.makeText(applicationContext, "Đã ngắt kết nối !", Toast.LENGTH_LONG).show()
                 } catch (e: Exception) {
-                    Toast.makeText(applicationContext, "not connected !", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "Chưa kết nối !", Toast.LENGTH_LONG).show()
                 }
 
             }

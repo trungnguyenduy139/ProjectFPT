@@ -29,7 +29,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
 @SuppressLint("MissingPermission")
-class Bluetooth : Activity(), OnItemClickListener {
+class BluetoothDevices : Activity(), OnItemClickListener {
     internal lateinit var listAdapter: ArrayAdapter<String>
     private lateinit var listView: ListView
     private lateinit var devicesArray: Set<BluetoothDevice>
@@ -43,7 +43,7 @@ class Bluetooth : Activity(), OnItemClickListener {
         setContentView(R.layout.bluetooth_activity)
         init()
         if (btAdapter == null) {
-            Toast.makeText(applicationContext, "No bluetooth detected", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Không tìm thấy bluetooth", Toast.LENGTH_SHORT).show()
             finish()
         } else {
             if (!btAdapter!!.isEnabled) {
@@ -135,7 +135,7 @@ class Bluetooth : Activity(), OnItemClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_CANCELED) {
-            Toast.makeText(applicationContext, "Bluetooth must be enabled to continue", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Cần bật bluetooth để tiếp tục", Toast.LENGTH_SHORT).show()
             finish()
         }
     }
@@ -150,7 +150,7 @@ class Bluetooth : Activity(), OnItemClickListener {
             val connect = ConnectThread(selectedDevice)
             connect.start()
         } else {
-            Toast.makeText(applicationContext, "device is not paired", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Thiết bị chưa được pair", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -216,8 +216,7 @@ class Bluetooth : Activity(), OnItemClickListener {
                     buffer = ByteArray(1024)
                     bytes = mmInStream!!.read(buffer)
                     mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer).sendToTarget()
-                } catch (e: IOException) {
-                    break
+                } catch (ignored: IOException) {
                 }
 
             }
@@ -225,7 +224,7 @@ class Bluetooth : Activity(), OnItemClickListener {
         fun cancel() {
             try {
                 mmSocket.close()
-            } catch (e: IOException) {
+            } catch (ignored: IOException) {
             }
 
         }
