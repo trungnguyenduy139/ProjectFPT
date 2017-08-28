@@ -26,7 +26,7 @@ class PlayerService : Service() {
 
     override fun onCreate() {
         mMediaPlayer = MediaPlayer()
-        registerReceiver(songUrlReceiver, IntentFilter(
+        registerReceiver(mReceiver, IntentFilter(
                 MainActivity.Companion.INTENT_SERVICE))
     }
 
@@ -34,7 +34,7 @@ class PlayerService : Service() {
         return Service.START_NOT_STICKY
     }
 
-    private var songUrlReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+    private var mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val url: String? = intent.getStringExtra(MainActivity.Companion.URL)
             if (mUrl == null || mUrl != url) {
@@ -57,7 +57,7 @@ class PlayerService : Service() {
     override fun onBind(intent: Intent): IBinder? = mMessenger.binder
 
     override fun onDestroy() {
-        unregisterReceiver(songUrlReceiver)
+        unregisterReceiver(mReceiver)
         mMediaPlayer!!.release()
     }
 
