@@ -29,13 +29,13 @@ import android.widget.ListView
 import android.widget.Toast
 
 class BluetoothDevices : Activity(), OnItemClickListener {
-    internal lateinit var mAdapter: ArrayAdapter<String>
-    private lateinit var mListView: ListView
-    private lateinit var mDevicesArray: Set<BluetoothDevice>
-    internal lateinit var mPairedDevices: ArrayList<String>
-    internal lateinit var mDevices: ArrayList<BluetoothDevice>
-    private lateinit var mFilter: IntentFilter
-    private lateinit var mReceiver: BroadcastReceiver
+    internal var mAdapter: ArrayAdapter<String>? = null
+    private var mListView: ListView? = null
+    private var mDevicesArray: Set<BluetoothDevice>? = null
+    internal var mPairedDevices: ArrayList<String>? = null
+    internal var mDevices: ArrayList<BluetoothDevice>? = null
+    private var mFilter: IntentFilter? = null
+    private var mReceiver: BroadcastReceiver? = null
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,18 +66,16 @@ class BluetoothDevices : Activity(), OnItemClickListener {
 
     private fun getPairedDevices() {
         mDevicesArray = mBlueToothAdapter!!.bondedDevices
-        if (mDevicesArray.isNotEmpty()) {
-            for (device in mDevicesArray) {
-                mPairedDevices.add(device.name)
-            }
+        if (mDevicesArray?.isNotEmpty()!!) {
+            mDevicesArray?.forEach { mPairedDevices?.add(it.name) }
         }
     }
 
     private fun init() {
         mListView = findViewById(R.id.listView)
-        mListView.onItemClickListener = this
+        mListView?.onItemClickListener = this
         mAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, 0)
-        mListView.adapter = mAdapter
+        mListView?.adapter = mAdapter
         mBlueToothAdapter = BluetoothAdapter.getDefaultAdapter()
         mPairedDevices = ArrayList()
         mFilter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -88,9 +86,9 @@ class BluetoothDevices : Activity(), OnItemClickListener {
                 when (action) {
                     BluetoothDevice.ACTION_FOUND -> {
                         val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
-                        mDevices.add(device)
-                        val s = if (mPairedDevices.indices.any { device.name == mPairedDevices[it] }) "(Paired)" else ""
-                        mAdapter.add(device.name + " " + s + " " + "\n" + device.address)
+                        mDevices?.add(device)
+                        val status = if (mPairedDevices?.indices!!.any { device.name == mPairedDevices!![it] }) "(Paired)" else ""
+                        mAdapter?.add(device.name + " " + status + " " + "\n" + device.address)
                     }
                     BluetoothAdapter.ACTION_DISCOVERY_STARTED -> {
                     }
@@ -133,9 +131,9 @@ class BluetoothDevices : Activity(), OnItemClickListener {
         if (mBlueToothAdapter!!.isDiscovering) {
             mBlueToothAdapter!!.cancelDiscovery()
         }
-        if (mAdapter.getItem(arg2)!!.contains("(Paired)")) {
+        if (mAdapter?.getItem(arg2)!!.contains("(Paired)")) {
 
-            val selectedDevice = mDevices[arg2]
+            val selectedDevice = mDevices!![arg2]
             val connect = ConnectThread(selectedDevice)
             connect.start()
         } else {
