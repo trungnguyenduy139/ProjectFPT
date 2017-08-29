@@ -1,6 +1,7 @@
 package com.example.trungnguyen.finalprojectfpt
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -90,8 +91,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mListTrack = ArrayList()
-        mListTrack.add("http://zmp3-mp3-s1-te-zmp3-bdhcm-1.zadn.vn/ccdf4a779033796d2022/7340335391073080988?authen=exp=1503969897~acl=/ccdf4a779033796d2022/*~hmac=0db50abfc497ecbcf547eae0a2971739")
-        mListTrack.add("http://zmp3-mp3-s1-te-vnso-tn-8.zadn.vn/0084a8e771a398fdc1b2/2434791795262812451?authen=exp=1503969290~acl=/0084a8e771a398fdc1b2/*~hmac=c9f8ef989dc4809752ad712935fbddf7")
+        mListTrack.add("http://zmp3-mp3-s1-te-vnso-tn-8.zadn.vn/3cedeac33387dad98396/8127820420268223686?authen=exp=1504043319~acl=/3cedeac33387dad98396/*~hmac=05df59734e10ee170770a347f2e64b30")
+        mListTrack.add("http://zmp3-mp3-s1-te-zmp3-fpthcm-1.zadn.vn/ccdf4a779033796d2022/7340335391073080988?authen=exp=1504042430~acl=/ccdf4a779033796d2022/*~hmac=1ce485de5a5a275a804273494f6dcffb")
         addControls()
         mUrl = mListTrack[0]
         BluetoothDevices.getHandler(mHandler)
@@ -221,7 +222,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val id = item?.itemId
         when (id) {
-            R.id.bt_connect -> startActivity(Intent(this, BluetoothDevices::class.java))
+            R.id.bt_connect -> {
+                if (BluetoothAdapter.getDefaultAdapter().isEnabled)
+                    startActivity(Intent(this, BluetoothDevices::class.java))
+                else Toast.makeText(this, "Cần kết nối bluetooth trước khi tao tác", Toast.LENGTH_SHORT).show()
+            }
             R.id.bt_disconnect -> {
                 try {
                     BluetoothDevices.mConnectedThread!!.cancel()
