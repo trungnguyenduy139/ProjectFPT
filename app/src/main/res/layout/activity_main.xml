@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rootFragmentNowPlaying"
-    android:background="#161d4f"
+    android:background="#2196F3"
     android:gravity="center"
     tools:context="com.example.trungnguyen.finalprojectfpt.MainActivity">
     <ImageView
@@ -21,7 +21,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/btPlayPause"
-        android:src="@drawable/play_circle" />
+        android:src="@drawable/ic_action_play" />
 
 
     <ImageView

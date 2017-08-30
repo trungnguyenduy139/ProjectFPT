@@ -21,7 +21,7 @@ class ActivityHandler(private val mMainActivity: MainActivity) : Handler() {
             }
 
             //Change button to "Pause"
-            mMainActivity.imgPlayPause?.setImageResource(R.drawable.pause_circle)
+            mMainActivity.imgPlayPause?.setImageResource(R.drawable.ic_action_pause)
         } else if (msg.arg1 == 1) {
             //Music is playing
             val message = Message.obtain()
@@ -33,7 +33,7 @@ class ActivityHandler(private val mMainActivity: MainActivity) : Handler() {
             }
 
             //Change the button to "Play"
-            mMainActivity.imgPlayPause?.setImageResource(R.drawable.play_circle)
+            mMainActivity.imgPlayPause?.setImageResource(R.drawable.ic_action_play)
         }
     }
 }

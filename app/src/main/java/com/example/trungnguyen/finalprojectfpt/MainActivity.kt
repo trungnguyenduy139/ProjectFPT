@@ -30,17 +30,17 @@ class MainActivity : AppCompatActivity() {
     private var mBound = false
     private val mActivityMessenger = Messenger(ActivityHandler(this))
     private var mPlayerMessenger: Messenger? = null
-    private var mUrl: String? = null
+    private var mResId: Int? = null
     private var mIndex: Int = 0
-    private lateinit var mListTrack: ArrayList<String>
+    private lateinit var mListTrack: ArrayList<Int>
     private var mServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder) {
             mBound = true
             val serviceIntent = Intent(this@MainActivity, PlayerService::class.java)
             startService(serviceIntent)
             val intent = Intent(INTENT_SERVICE)
-            if (mUrl != null) {
-                intent.putExtra(URL, mUrl)
+            if (mResId != null) {
+                intent.putExtra(URL, mResId!!)
                 sendBroadcast(intent)
             }
             if (isNetworkAvailable) {
@@ -91,10 +91,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         mListTrack = ArrayList()
-        mListTrack.add("http://zmp3-mp3-s1-te-vnso-tn-8.zadn.vn/3cedeac33387dad98396/8127820420268223686?authen=exp=1504043319~acl=/3cedeac33387dad98396/*~hmac=05df59734e10ee170770a347f2e64b30")
-        mListTrack.add("http://zmp3-mp3-s1-te-zmp3-fpthcm-1.zadn.vn/ccdf4a779033796d2022/7340335391073080988?authen=exp=1504042430~acl=/ccdf4a779033796d2022/*~hmac=1ce485de5a5a275a804273494f6dcffb")
+        mListTrack.add(R.raw.file1)
+        mListTrack.add(R.raw.file2)
         addControls()
-        mUrl = mListTrack[0]
+        mResId = mListTrack[0]
         BluetoothDevices.getHandler(mHandler)
     }
 
@@ -127,9 +127,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun play(index: Int) {
         val intent = Intent(INTENT_SERVICE)
-        mUrl = mListTrack[index]
-        if (mUrl != null) {
-            intent.putExtra(URL, mUrl)
+        mResId = mListTrack[index]
+        if (mResId != null) {
+            intent.putExtra(URL, mResId!!)
             sendBroadcast(intent)
         }
         if (isNetworkAvailable) {
@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         val intent = Intent(this, PlayerService::class.java)
-        if (mUrl != null)
+        if (mResId != null)
             bindService(intent, mServiceConnection, Context.BIND_AUTO_CREATE)
     }
 
@@ -241,7 +241,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val INTENT_SERVICE = "send_track_intent"
-        const val URL = "URL"
+        const val URL = "url"
     }
 }
 

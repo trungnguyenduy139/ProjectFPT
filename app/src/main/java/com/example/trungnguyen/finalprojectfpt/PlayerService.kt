@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.IBinder
 import android.os.Messenger
 import android.util.Log
@@ -22,10 +21,9 @@ import java.io.IOException
 class PlayerService : Service() {
     private var mMediaPlayer: MediaPlayer? = null
     internal var mMessenger = Messenger(PlayerHandler(this))
-    private var mUrl: String? = null
+    private var mResId: Int? = null
 
     override fun onCreate() {
-        mMediaPlayer = MediaPlayer()
         registerReceiver(mReceiver, IntentFilter(
                 MainActivity.Companion.INTENT_SERVICE))
     }
@@ -36,20 +34,21 @@ class PlayerService : Service() {
 
     private var mReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val url: String? = intent.getStringExtra(MainActivity.Companion.URL)
-            if (mUrl == null || mUrl != url) {
-                val uri = Uri.parse(url)
+            val resId: Int? = intent.getIntExtra(MainActivity.Companion.URL, 0)
+            if (mResId != resId) {
+                if (mMediaPlayer != null) {
+                    mMediaPlayer!!.release()
+                    mMediaPlayer = null
+                }
+                mMediaPlayer = MediaPlayer.create(applicationContext, resId!!)
                 try {
-                    mMediaPlayer!!.seekTo(0)
-                    mMediaPlayer!!.reset()
-                    mMediaPlayer!!.setDataSource(applicationContext, uri)
                     mMediaPlayer!!.setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    mMediaPlayer!!.prepare()
+                    mMediaPlayer!!.start()
                     mMediaPlayer!!.isLooping = true
                 } catch (e: IOException) {
                     Log.d(TAG, e.message)
                 }
-                mUrl = url
+                mResId = resId
             }
         }
     }
